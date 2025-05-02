@@ -17,6 +17,7 @@
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/ADT/StringExtras.h>
+#include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/InlineAsm.h>
 #include <llvm/IR/PassManager.h>
 #include <llvm/Passes/PassBuilder.h>
@@ -179,7 +180,7 @@ void InsertCounterFunctionWithDefinitionAArch64(LLVMContext &C, Module &M,
   // Also x7 is not reliably preserved across syscalls
   auto constraintsString = "r,~{x8},~{x0},~{x1},~{x2},~{x3},~{x4},~{x5},~{x7}"
                            ",~{x16},~{x17},~{nzcv},~{memory}";
-  auto err = InlineAsm::verify(FuncTypeM, constraintsString);
+  auto err = InlineAsm::Verify(FuncTypeM, constraintsString);
   assert(!bool(err));
 
   auto FuncAsmM =
@@ -298,7 +299,7 @@ void InsertCounterFunctionWithDefinitionX86_64(LLVMContext &C, Module &M,
                    "pop r12\n"
                    "jmp 4b\n";
   auto constraintsString = "{rax},~{r11},~{cc},~{memory}";
-  auto err = InlineAsm::verify(FuncTypeM, constraintsString);
+  auto err = InlineAsm::Verify(FuncTypeM, constraintsString);
   assert(!bool(err));
 
   auto FuncAsmM = InlineAsm::get(FuncTypeM, asmString, constraintsString, false,
